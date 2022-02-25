@@ -1,0 +1,403 @@
+create database quanlyhanghoa;
+use quanlyhanghoa;
+
+create table VatTu
+(
+    id        int auto_increment primary key,
+    MaVatTu   varchar(50) not null unique,
+    TenVatTu  varchar(50) not null,
+    DonViTinh varchar(20) not null,
+    GiaTien   double      not null
+);
+
+insert into VatTu(MaVatTu, TenVatTu, DonViTinh, GiaTien)
+values ('VT1', 'A', 'Cái', 5000),
+       ('VT2', 'B', 'Kg', 6000),
+       ('VT3', 'C', 'Tấn', 500000),
+       ('VT4', 'D', 'Lít', 22000),
+       ('VT5', 'E', 'Bao', 90000);
+
+create table TonKho
+(
+    id              int auto_increment primary key,
+    VatTu_Id        int    not null,
+    SoLuongDauKy    double not null,
+    TongSoLuongNhap double not null,
+    TongSoLuongXuat double not null
+);
+
+insert into TonKho(VatTu_Id, SoLuongDauKy, TongSoLuongNhap, TongSoLuongXuat)
+values (1, 100, 1000, 850),
+       (2, 1000, 2500, 3050),
+       (3, 10, 10, 15),
+       (4, 1240, 1000, 870),
+       (5, 25, 100, 90);
+
+alter table TonKho
+    add foreign key (VatTu_Id) references VatTu (id);
+
+create table NhaCungCap
+(
+    id            int auto_increment primary key,
+    MaNhaCungCap  varchar(50) unique not null,
+    TenNhaCungCap varchar(50)        not null,
+    DiaChi        varchar(50)        not null,
+    SDT           varchar(10) unique not null
+);
+
+insert into NhaCungCap(MaNhaCungCap, TenNhaCungCap, DiaChi, SDT)
+values ('NCC1', 'A1', 'B1', '1111'),
+       ('NCC2', 'A2', 'B2', '2222'),
+       ('NCC3', 'A3', 'B3', '3333');
+
+create table DonDatHang
+(
+    id            int auto_increment primary key,
+    MaDonHang     varchar(50) not null unique,
+    NgayDatHang   DATE,
+    NhaCungCap_Id int
+);
+
+insert into DonDatHang(MaDonHang, NgayDatHang, NhaCungCap_Id)
+values ('DDH1', '2021-2-21', 1),
+       ('DDH2', '2021-2-25', 2),
+       ('DDH3', '2021-2-28', 1);
+
+alter table DonDatHang
+    add foreign key (NhaCungCap_Id) references NhaCungCap (id);
+
+create table PhieuNhap
+(
+    id            int auto_increment primary key,
+    MaPhieuNhap   varchar(50) unique not null,
+    NgayNhap      DATE,
+    DonDatHang_Id int
+);
+
+insert into PhieuNhap(MaPhieuNhap, NgayNhap, DonDatHang_Id)
+values ('PNK1', '2021-2-25', 1),
+       ('PNK2', '2021-2-26', 2),
+       ('PNK3', '2021-2-28', 1);
+
+alter table PhieuNhap
+    add foreign key (DonDatHang_Id) references DonDatHang (id);
+
+create table PhieuXuat
+(
+    id           int auto_increment primary key,
+    MaPhieuXuat  varchar(50) unique not null,
+    NgayXuat     DATE,
+    TenKhachHang varchar(50)        not null
+);
+
+insert into PhieuXuat(MaPhieuXuat, NgayXuat, TenKhachHang)
+values ('PXK1', '2021-1-15', 'AAA'),
+       ('PXK2', '2021-1-18', 'BBB'),
+       ('PXK3', '2021-1-25', 'CCC');
+
+create table ChiTietDonDatHang
+(
+    id            int auto_increment primary key,
+    DonDatHang_Id int,
+    VatTu_Id      int,
+    SoLuong       double not null
+);
+
+insert into ChiTietDonDatHang(DonDatHang_Id, VatTu_Id, SoLuong)
+values (1, 1, 20),
+       (1, 2, 800),
+       (2, 3, 4),
+       (2, 4, 950),
+       (3, 1, 10),
+       (3, 5, 7);
+
+
+
+alter table chitietdondathang
+    add foreign key (DonDatHang_Id) references DonDatHang (id);
+alter table chitietdondathang
+    add foreign key (VatTu_Id) references VatTu (id);
+
+create table ChiTietPhieuNhap
+(
+    id           int auto_increment primary key,
+    PhieuNhap_Id int,
+    VatTu_Id     int,
+    SoLuongNhap  double,
+    DonGiaNhap   double,
+    GhiChu       varchar(50)
+);
+
+insert into ChiTietPhieuNhap(PhieuNhap_Id, VatTu_Id, SoLuongNhap, DonGiaNhap, GhiChu)
+values (1, 1, 20, 5000, 'Ok'),
+       (1, 2, 800, 6000, 'Ok'),
+       (2, 3, 4, 500000, 'Ok'),
+       (2, 4, 950, 22000, 'Ok'),
+       (3, 1, 10, 5000, 'Ok'),
+       (3, 5, 7, 90000, 'Ok');
+
+
+alter table ChiTietPhieuNhap
+    add foreign key (PhieuNhap_Id) references PhieuNhap (id);
+alter table ChiTietPhieuNhap
+    add foreign key (VatTu_Id) references VatTu (id);
+
+create table ChiTietPhieuXuat
+(
+    id           int auto_increment primary key,
+    PhieuXuat_Id int,
+    VatTu_Id     int,
+    SoLuongXuat  double,
+    DonGiaXuat   double,
+    GhiChu       varchar(50)
+);
+
+insert into ChiTietPhieuXuat(PhieuXuat_Id, VatTu_Id, SoLuongXuat, DonGiaXuat, GhiChu)
+values (1, 1, 500, 5000, 'Ok'),
+       (1, 3, 15, 500000, 'Ok'),
+       (2, 1, 350, 5000, 'Ok'),
+       (2, 2, 3050, 6000, 'Ok'),
+       (3, 4, 870, 22000, 'Ok'),
+       (3, 5, 90, 90000, 'Ok');
+
+
+
+alter table ChiTietPhieuXuat
+    add foreign key (PhieuXuat_Id) references PhieuXuat (id);
+alter table ChiTietPhieuXuat
+    add foreign key (VatTu_Id) references VatTu (id);
+
+
+
+#1 Tạo view có tên vw_CTPNHAP bao gồm các thông tin sau: số phiếu nhập hàng,
+# mã vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+create view view_CTPNhap as
+select pn.MaPhieuNhap,
+       vt.MaVatTu,
+       ctpn.SoLuongNhap,
+       ctpn.DonGiaNhap,
+       (SoLuongNhap * DonGiaNhap) as `Thanh Tien`
+from ChiTietPhieuNhap ctpn
+         join PhieuNhap pn on ctpn.PhieuNhap_Id = pn.id
+         join VatTu VT on ctpn.VatTu_Id = VT.id;
+
+select *
+from view_CTPNhap;
+
+#2 Tạo view có tên vw_CTPNHAP_VT bao gồm các thông tin sau: số phiếu nhập hàng,
+# mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+
+create view view_CTPNhap_VT as
+select pn.MaPhieuNhap,
+       vt.MaVatTu,
+       vt.TenVatTu,
+       ctpn.SoLuongNhap,
+       ctpn.DonGiaNhap,
+       (SoLuongNhap * DonGiaNhap) as `Thanh Tien`
+from ChiTietPhieuNhap ctpn
+         join PhieuNhap pn on ctpn.PhieuNhap_Id = pn.id
+         join VatTu VT on ctpn.VatTu_Id = VT.id;
+
+select *
+from view_CTPNhap_VT;
+
+#3 Tạo view có tên vw_CTPNHAP_VT_PN bao gồm các thông tin sau: số phiếu nhập hàng, ngày nhập hàng,
+# số đơn đặt hàng, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+
+create view view_CTPNhap_VT_PN as
+select pn.MaPhieuNhap,
+       pn.NgayNhap,
+       ddh.MaDonHang,
+       vt.MaVatTu,
+       vt.TenVatTu,
+       ctpn.SoLuongNhap,
+       ctpn.DonGiaNhap,
+       (SoLuongNhap * DonGiaNhap) as `Thanh Tien`
+from ChiTietPhieuNhap ctpn
+         join PhieuNhap pn on ctpn.PhieuNhap_Id = pn.id
+         join VatTu VT on ctpn.VatTu_Id = VT.id
+         join dondathang ddh on pn.DonDatHang_Id = ddh.id;
+
+select *
+from view_CTPNhap_VT_PN;
+
+#4 Tạo view có tên vw_CTPNHAP_VT_PN_DH bao gồm các thông tin sau: số phiếu nhập hàng, ngày nhập hàng,
+# số đơn đặt hàng, mã nhà cung cấp, mã vật tư, tên vật tư, số lượng nhập, đơn giá nhập, thành tiền nhập.
+create view view_CTPNHAP_VT_PN_DH as
+select pn.MaPhieuNhap,
+       pn.NgayNhap,
+       ddh.MaDonHang,
+       ncc.MaNhaCungCap,
+       vt.MaVatTu,
+       vt.TenVatTu,
+       ctpn.SoLuongNhap,
+       ctpn.DonGiaNhap,
+       (SoLuongNhap * DonGiaNhap) as `Thanh Tien`
+from ChiTietPhieuNhap ctpn
+         join PhieuNhap pn on ctpn.PhieuNhap_Id = pn.id
+         join VatTu VT on ctpn.VatTu_Id = VT.id
+         join dondathang ddh on pn.DonDatHang_Id = ddh.id
+         join nhacungcap ncc on ddh.NhaCungCap_Id = ncc.id;
+
+select *
+from view_CTPNHAP_VT_PN_DH;
+
+#5 Tạo view có tên vw_CTPNHAP_loc  bao gồm các thông tin sau: số phiếu nhập hàng, mã vật tư, số lượng nhập,
+# đơn giá nhập, thành tiền nhập. Và chỉ liệt kê các chi tiết nhập có số lượng nhập > 5.
+
+create view view_CTPNHAP_loc as
+select pn.MaPhieuNhap, vt.MaVatTu, ctpn.SoLuongNhap, ctpn.DonGiaNhap, (SoLuongNhap * DonGiaNhap) as `Thanh Tien`
+from ChiTietPhieuNhap ctpn
+         join phieunhap pn on ctpn.PhieuNhap_Id = pn.id
+         join VatTu VT on ctpn.VatTu_Id = VT.id
+where SoLuongNhap > 5;
+
+select *
+from view_CTPNHAP_loc;
+
+#6 Tạo view có tên vw_CTPNHAP_VT_loc bao gồm các thông tin sau: số phiếu nhập hàng, mã vật tư, tên vật tư,
+# số lượng nhập, đơn giá nhập, thành tiền nhập. Và chỉ liệt kê các chi tiết nhập vật tư có đơn vị tính là Cái.
+
+create view view_CTPNHAP_VT_loc as
+select pn.MaPhieuNhap,
+       vt.MaVatTu,
+       vt.TenVatTu,
+       ctpn.SoLuongNhap,
+       ctpn.DonGiaNhap,
+       (SoLuongNhap * DonGiaNhap) as `Thanh Tien`
+from ChiTietPhieuNhap ctpn
+         join phieunhap pn on ctpn.PhieuNhap_Id = pn.id
+         join VatTu VT on ctpn.VatTu_Id = VT.id
+where vt.DonViTinh = 'Cái';
+
+select *
+from view_CTPNHAP_VT_loc;
+
+#7 Tạo view có tên vw_CTPXUAT bao gồm các thông tin sau: số phiếu xuất hàng, mã vật tư,
+# số lượng xuất, đơn giá xuất, thành tiền xuất.
+
+create view view_CTPXUAT as
+select px.MaPhieuXuat,
+       vt.MaVatTu,
+       ctpx.SoLuongXuat,
+       ctpx.DonGiaXuat,
+       (ctpx.SoLuongXuat * ctpx.DonGiaXuat) as `Thanh Tien`
+from chitietphieuxuat ctpx
+         join PhieuXuat PX on ctpx.PhieuXuat_Id = PX.id
+         join VatTu VT on VT.id = ctpx.VatTu_Id;
+
+select *
+from view_CTPXUAT;
+
+
+#8 Tạo view có tên vw_CTPXUAT_VT bao gồm các thông tin sau: số phiếu xuất hàng,
+# mã vật tư, tên vật tư, số lượng xuất, đơn giá xuất.
+
+create view view_CTPXUAT_VT as
+select px.MaPhieuXuat, vt.MaVatTu, vt.TenVatTu, ctpx.SoLuongXuat, ctpx.DonGiaXuat
+from chitietphieuxuat ctpx
+         join PhieuXuat PX on ctpx.PhieuXuat_Id = PX.id
+         join VatTu VT on VT.id = ctpx.VatTu_Id;
+
+select *
+from view_CTPXUAT_VT;
+
+#9 Tạo view có tên vw_CTPXUAT_VT_PX bao gồm các thông tin sau: số phiếu xuất hàng, tên khách hàng,
+# mã vật tư, tên vật tư, số lượng xuất, đơn giá xuất.
+
+create view view_CTPXUAT_VT_PX as
+select px.MaPhieuXuat, px.TenKhachHang, vt.MaVatTu, vt.TenVatTu, ctpx.SoLuongXuat, ctpx.DonGiaXuat
+from chitietphieuxuat ctpx
+         join PhieuXuat PX on ctpx.PhieuXuat_Id = PX.id
+         join VatTu VT on VT.id = ctpx.VatTu_Id;
+
+select *
+from view_CTPXUAT_VT_PX;
+
+
+#1 Tạo Stored procedure (SP) cho biết tổng số lượng cuối của vật tư với mã vật tư là tham số vào.
+
+DELIMITER //
+create procedure TonKhoVatTu(in vattu_id int)
+BEGIN
+    select vt.id,
+           vt.TenVatTu,
+           (TonKho.SoLuongDauKy + TonKho.TongSoLuongNhap - TonKho.TongSoLuongXuat) as `Ton Kho`,
+           vt.DonViTinh
+    from TonKho
+             join VatTu VT on VT.id = TonKho.VatTu_Id
+    where TonKho.id = VatTu_Id;
+end //
+DELIMITER ;
+
+call TonKhoVatTu(1);
+call TonKhoVatTu(2);
+
+#2 Tạo SP cho biết tổng tiền xuất của vật tư với mã vật tư là tham số vào.
+
+DELIMITER //
+create procedure TongTienXuatVatTu(in vattu_id int)
+BEGIN
+    select vt.id, vt.TenVatTu, (TonKho.TongSoLuongXuat * vt.GiaTien) as `TongTienXuat`
+    from TonKho
+             join VatTu VT on VT.id = TonKho.VatTu_Id
+    where TonKho.id = VatTu_Id;
+end //
+DELIMITER ;
+
+call TongTienXuatVatTu(3);
+call TongTienXuatVatTu(4);
+
+#3 Tạo SP cho biết tổng số lượng đặt theo số đơn hàng với số đơn hàng là tham số vào.
+DELIMITER //
+create procedure TongSoLuongDatHang(in id_dondathang int)
+BEGIN
+    select DonDatHang_Id,sum(SoLuong)
+    from chitietdondathang
+    where DonDatHang_Id = id_dondathang
+    group by DonDatHang_Id;
+end //
+DELIMITER ;
+
+
+
+call TongSoLuongDatHang(1);
+call TongSoLuongDatHang(2);
+call TongSoLuongDatHang(3);
+
+#4 Tạo SP dùng để thêm một đơn đặt hàng.
+
+DELIMITER //
+create procedure InputDonDatHang(
+in MaDH varchar(50),
+in ngaydat date,
+in nhacc int
+)
+BEGIN
+insert into DonDatHang(MaDonHang, NgayDatHang, NhaCungCap_Id) values (MaDH,ngaydat,nhacc);
+end //
+DELIMITER ;
+
+drop procedure InputDonDatHang;
+
+call InputDonDatHang('DDH4','2022-2-25',2);
+call InputDonDatHang('DDH5','2022-2-26',3);
+
+#5 Tạo SP dùng để thêm một chi tiết đơn đặt hàng.
+
+DELIMITER //
+create procedure InputChiTietDonDatHang(
+    in id_DDH int,
+    in id_vt int,
+    in So_luong double
+)
+BEGIN
+    insert into chitietdondathang(DonDatHang_Id, VatTu_Id, SoLuong) values (id_DDH,id_vt,So_luong);
+end //
+DELIMITER ;
+
+drop procedure InputDonDatHang;
+
+call InputChiTietDonDatHang(4,3,20);
+call InputChiTietDonDatHang(4,5,30);
+call InputChiTietDonDatHang(5,2,1030);
